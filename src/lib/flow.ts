@@ -102,7 +102,7 @@ export function sampleFlow(): { nodes: DecisionNode[]; edges: BranchEdge[] } {
         260,
         20,
         "Support request?",
-        "Is this message a customer support request (a problem, complaint or question about an existing account or product)?",
+        "Is this message a customer support request: someone reporting a problem, error or complaint with something they already use or paid for? Questions about pricing, plans, demos or buying are NOT support requests.",
       ),
       node(
         "n_support",

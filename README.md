@@ -4,7 +4,11 @@ A visual workflow builder where every node is an AI decision that answers **YES*
 
 ![A finished run: the taken path is highlighted, the untaken branch is faded, the log is on the right](docs/screenshot-run.png)
 
-*A finished run (recorded with `LLM_STUB=1`, hence the `stub` model). The path taken is bold, the untaken branch fades, and the log shows each step.*
+*A support message, judged by `openai/gpt-oss-20b` on Groq. The path taken is bold, the untaken branch fades, and the log shows each step with the model's answer and timing.*
+
+The same flow with a sales message takes the other branch:
+
+![A sales message: the first node answers NO, so the flow follows the NO edge to the sales node](docs/screenshot-run-sales.png)
 
 ```
 "Is this a support request?"
@@ -31,10 +35,14 @@ Any OpenAI-compatible provider works; the OpenAI SDK is pointed at it with three
 
 | Provider | `LLM_BASE_URL` | `LLM_MODEL` (example) |
 | --- | --- | --- |
-| Groq (free tier) | `https://api.groq.com/openai/v1` | `llama-3.1-8b-instant` |
+| Groq (free tier) — used for the screenshots | `https://api.groq.com/openai/v1` | `openai/gpt-oss-20b` |
 | OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` |
 | OpenRouter | `https://openrouter.ai/api/v1` | `openrouter/free` |
 | Ollama (local) | `http://localhost:11434/v1` (`LLM_API_KEY=ollama`) | `llama3.2` |
+
+Groq retires models from time to time (a `404 … model does not exist` means the name is stale); `curl https://api.groq.com/openai/v1/models -H "Authorization: Bearer $LLM_API_KEY"` lists what your key can use.
+
+Reasoning models such as `gpt-oss` think before answering, and that thinking counts against the token cap. `LLM_MAX_TOKENS` (default 512) leaves room for it, and `LLM_REASONING_EFFORT=low` keeps a one-word answer fast (~0.4 s per node). Leave the effort unset for models that don't reason.
 
 No key yet? Set `LLM_STUB=1` and the whole app runs against a keyword heuristic instead of a model. It's only for exercising the plumbing (steps, branching, UI) and is never used unless you turn it on.
 
@@ -66,6 +74,10 @@ poll GET /api/runs/:id  ◀──────────────  run recor
 - **Branching.** After a node answers, the function follows the edge drawn for that answer. If the user didn't draw one, the flow ends at that node, and its answer is the final decision.
 - **Execution order** is the step index (`#1`, `#2`, …), stored in the run record and shown on the node, in the log, and in history.
 - **Progress reaches the browser** through a small run store (`src/lib/run-store.ts`): the workflow writes to it inside each step, the UI polls `GET /api/runs/:id` every 600 ms.
+
+Each node shows up as its own step in the Inngest dev dashboard (`http://localhost:8288`), with its own timing:
+
+![Inngest trace of one run: start-run, node-0-n_start, node-1-n_sales, finish-run](docs/screenshot-inngest.png)
 
 ### Edge types
 

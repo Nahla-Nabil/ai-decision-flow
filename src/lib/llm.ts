@@ -81,10 +81,18 @@ export async function decide(prompt: string, input: string): Promise<Decision> {
     maxRetries: 0,
   });
 
+  // Reasoning models (e.g. gpt-oss) spend part of this budget thinking before
+  // they answer; too small a budget yields an empty reply. The answer itself
+  // is one word, so a generous cap costs almost nothing.
+  const maxTokens = Number(process.env.LLM_MAX_TOKENS ?? 512);
+  const effort = process.env.LLM_REASONING_EFFORT as "low" | "medium" | "high" | undefined;
+
   const completion = await client.chat.completions.create({
     model,
     temperature: 0,
-    max_completion_tokens: 32,
+    max_completion_tokens: maxTokens,
+    // Only sent when set: providers/models without reasoning reject the field.
+    ...(effort ? { reasoning_effort: effort } : {}),
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: buildUserMessage(prompt, input) },
