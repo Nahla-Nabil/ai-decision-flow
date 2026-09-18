@@ -167,20 +167,20 @@ function Editor() {
   }
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-dvh flex-col">
       <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-background px-4">
         <h1 className="mr-auto text-sm font-semibold">AI Decision Flow</h1>
         <Button size="sm" onClick={handleAddNode}>
-          <Plus /> Add node
+          <Plus /> <span className="max-sm:sr-only">Add node</span>
         </Button>
         <Button size="sm" variant="outline" onClick={handleExport}>
-          <Download /> Export
+          <Download /> <span className="max-sm:sr-only">Export</span>
         </Button>
         <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
-          <Upload /> Import
+          <Upload /> <span className="max-sm:sr-only">Import</span>
         </Button>
         <Button size="sm" variant="ghost" onClick={handleReset}>
-          <RotateCcw /> Sample
+          <RotateCcw /> <span className="max-sm:sr-only">Sample</span>
         </Button>
         <input
           ref={fileRef}
@@ -204,8 +204,9 @@ function Editor() {
         </div>
       )}
 
-      <div className="flex min-h-0 flex-1">
-        <div ref={canvasRef} className="min-w-0 flex-1">
+      {/* Side by side on desktop; canvas above, panel below on narrow screens. */}
+      <div className="flex min-h-0 flex-1 max-md:flex-col">
+        <div ref={canvasRef} className="min-h-0 min-w-0 flex-1">
           <ReactFlow<DecisionNode, BranchEdge>
             nodes={displayNodes}
             edges={displayEdges}
@@ -230,7 +231,7 @@ function Editor() {
           </ReactFlow>
         </div>
 
-        <aside className="flex w-[380px] shrink-0 flex-col border-l bg-background max-md:hidden">
+        <aside className="flex shrink-0 flex-col bg-background md:w-[380px] md:border-l max-md:h-[48%] max-md:border-t">
           <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)} className="gap-0">
             <TabsList className="m-3 w-auto">
               <TabsTrigger value="node">Node</TabsTrigger>

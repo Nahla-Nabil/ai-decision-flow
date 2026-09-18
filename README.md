@@ -53,6 +53,11 @@ No key yet? Set `LLM_STUB=1` and the whole app runs against a keyword heuristic 
 3. **Look back.** **History** lists past runs; click one to replay its path on the canvas.
 4. **Keep it.** The flow autosaves to your browser (localStorage). **Export** / **Import** move it as a JSON file.
 
+The layout adapts to small screens: below 768 px the panel moves under the canvas and the header buttons collapse to icons.
+
+<img src="docs/screenshot-mobile.png" alt="The app on a 390 px wide phone screen: canvas on top, run panel and log below" width="280">
+
+
 ## How it works
 
 ```
@@ -89,7 +94,7 @@ There are two edge types, `yes` and `no` (`src/components/flow/branch-edge.tsx`)
 | --- | --- |
 | Network error, timeout, 429, 5xx, or a reply that isn't YES/NO | The step is retried by Inngest (`retries: 3`, with backoff). The log shows *"Will retry — …"* and the node shows the try number. |
 | Missing key/model, or a 400/401/403/404/422 from the provider | Marked non-retriable: the run fails immediately with the reason. |
-| Retries exhausted | `onFailure` marks the run and the failing node as **failed**. |
+| Retries exhausted | `onFailure` marks the run and the failing node as **failed**, with the last error. Measured against an unreachable model: 4 attempts (the first try plus 3 retries, backing off ~30 s, ~55 s, ~70 s) and a failed run about 2.5 minutes after the start. |
 | Inngest dev server not running | The run request returns a clear error (502) instead of hanging; a run stuck queued for 8 s shows a hint. |
 | Invalid flow (two start nodes, empty prompt, loop…) | **Run** is disabled and the reasons are listed; the API re-checks and returns 400. |
 | Bad import file | A message explains what's wrong; the current flow is untouched. |
