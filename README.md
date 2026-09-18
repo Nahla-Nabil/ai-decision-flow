@@ -31,7 +31,7 @@ Both processes need to be running: the app serves the UI and the workflow code, 
 
 ### Configuring the model
 
-Any OpenAI-compatible provider works; the OpenAI SDK is pointed at it with three variables in `.env.local`:
+Any OpenAI-compatible provider works; the OpenAI SDK is pointed at it with three variables in `.env.local` (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`; two optional tuning variables are described below):
 
 | Provider | `LLM_BASE_URL` | `LLM_MODEL` (example) |
 | --- | --- | --- |
